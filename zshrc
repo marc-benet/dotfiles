@@ -1,12 +1,14 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
 # Path to your oh-my-zsh installation.
-export TERM="xterm-256color"
-export ZSH="~/.oh-my-zsh"
+export ZSH="/Users/marc/.oh-my-zsh"
 export EDITOR=nvim
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel9k/powerlevel9k"
 
 # Set list of themes to pick from when loading at random
@@ -25,8 +27,14 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
 
+# Uncomment the following line to automatically update without prompting.
+# DISABLE_UPDATE_PROMPT="true"
+
 # Uncomment the following line to change how often to auto-update (in days).
 # export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS=true
 
 # Uncomment the following line to disable colors in ls.
 # DISABLE_LS_COLORS="true"
@@ -51,7 +59,7 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="dd-mm-yyyy"
+# HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -68,7 +76,7 @@ plugins=(
   command-not-found
   common-aliases
   compleat
-  osx
+  macos
   python
   docker
   docker-machine
@@ -78,7 +86,6 @@ plugins=(
   nvm
   postgres
   python
-  django
   kubectl
   encode64
   jsontools
@@ -90,17 +97,16 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-
-# Theme PowerLevel9k
+# Load Theme PowerLevel9k
 POWERLEVEL9K_MODE='nerdfont-complete'
 source ~/.oh-my-zsh/custom/themes/powerlevel9k/powerlevel9k.zsh-theme
 
+# Config Theme Powerlevel9k
 POWERLEVEL9K_PROMPT_ADD_NEWLINE=true
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(status time ssh dir dir_writable vcs virtualenv command_execution_time)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=()
-POWERLEVEL9K_STATUS_VERBOSE=false
-POWERLEVEL9K_STATUS_BACKGROUND='darkgrey'
+POWERLEVEL9K_STATUS_VERBOSE=true
+POWERLEVEL9K_STATUS_OK_BACKGROUND='darkgrey'
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 POWERLEVEL9K_PROMPT_ON_NEWLINE=true
 POWERLEVEL9K_MULTILINE_FIRST_PROMPT_PREFIX=""
@@ -129,13 +135,65 @@ POWERLEVEL9K_CUSTOM_ICONS="echo -n '\uf302 \ue796'"
 POWERLEVEL9K_CUSTOM_ICONS_FOREGROUND="black"
 POWERLEVEL9K_CUSTOM_ICONS_BACKGROUND="blue"
 
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
 ###############################
 # Personal aliases and config #
 ###############################
-source ~/.bash_profile
+if [ -f ~/.bash_profile ]; then
+    source ~/.bash_profile
+fi
 ###############################
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Highlighting syntax
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source <(stern --completion=zsh)
+
+##########################
+# Projen auto completion #
+##########################
+###-begin-projen-completions-###
+#
+# yargs command completion script
+#
+# Installation: projen completion >> ~/.zshrc
+#    or projen completion >> ~/.zsh_profile on OSX.
+#
+_projen_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" projen --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _projen_yargs_completions projen
+###-end-projen-completions-###
+
